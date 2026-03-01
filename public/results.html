@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>النتائج | بوابة الطالب</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="dashboard-bg">
+    <nav class="navbar glass-nav">
+        <div class="nav-brand">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span>ابحث عن نتيجتك هنا بدل وجع راس الحرم الغبي</span>
+        </div>
+        <div class="nav-actions">
+            <!-- Student info will be injected here -->
+            <span id="navStudentName" class="student-name"></span>
+            <button id="logoutBtn" class="icon-btn" title="تسجيل الخروج">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </button>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+
+        <header class="page-header">
+            <h2><i class="fa-solid fa-graduation-cap" style="color:var(--primary-color);"></i> استعلام عن النتيجة</h2>
+            <p>اختر البيانات أدناه لعرض نتيجتك</p>
+        </header>
+
+        <section class="filters-card glass-card" style="margin-bottom: 2rem;">
+            <form id="resultsForm" class="filters-grid">
+
+                <div class="input-group dropdown-group">
+                    <label>العام الجامعي</label>
+                    <div class="select-wrapper">
+                        <select id="yearSelect" required>
+                            <option value="16">2025/2026</option>
+                            <option value="15" selected>2024/2025</option>
+                            <option value="14">2023/2024</option>
+                            <option value="13">2022/2023</option>
+                            <option value="12">2021/2022</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down select-icon"></i>
+                    </div>
+                </div>
+
+                <div class="input-group dropdown-group">
+                    <label>الفصل الدراسي</label>
+                    <div class="select-wrapper">
+                        <select id="semesterSelect" required>
+                            <option value="1">الفصل الدراسي الأول</option>
+                            <option value="2">الفصل الدراسي الثاني</option>
+                            <option value="3">صيفي</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down select-icon"></i>
+                    </div>
+                </div>
+
+                <div class="input-group dropdown-group">
+                    <label>الدور</label>
+                    <div class="select-wrapper">
+                        <select id="roundSelect" required>
+                            <option value="1">دور أول</option>
+                            <option value="2">دور ثاني</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down select-icon"></i>
+                    </div>
+                </div>
+
+                <div class="action-group">
+                    <label class="hidden-label">.</label>
+                    <button type="submit" id="searchBtn" class="primary-btn search-btn">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span>بحث</span>
+                        <div class="spinner hide"></div>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <div id="resultsMessage" class="message hide"></div>
+
+        <section id="resultsSection" class="results-section hide">
+
+            <div class="student-info-banner glass-card" id="studentDetailsBanner"
+                style="margin-bottom: 2rem; display: none; flex-direction: column; gap: 1.5rem;">
+
+                <!-- Row 1: Student Details -->
+                <div
+                    style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="background: rgba(67, 97, 238, 0.1); padding: 15px; border-radius: 50%;">
+                            <i class="fa-solid fa-user-graduate"
+                                style="font-size: 24px; color: var(--primary-color);"></i>
+                        </div>
+                        <div>
+                            <h3 id="studentDetailsName"
+                                style="margin-bottom: 5px; color: var(--text-primary); font-size: 1.3rem;"></h3>
+                            <div id="studentDetailsFaculty" style="color: var(--text-secondary); font-size: 0.95rem;">
+                            </div>
+                            <div id="studentDetailsLevel" style="color: var(--text-secondary); font-size: 0.95rem;">
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        style="text-align: right; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid var(--surface-border);">
+                        <div style="font-weight: bold; color: var(--accent-color);">كود الطالب / الرقم القومي: <br><span
+                                id="studentDetailsId" style="color: var(--text-primary); font-size: 1.1rem;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2: GPAs & Total Marks -->
+                <div class="summary-cards"
+                    style="width: 100%; display: flex; justify-content: space-between; gap: 15px; flex-wrap: wrap;">
+                </div>
+            </div>
+
+            <div class="table-container glass-card">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>كود المادة</th>
+                            <th>اسم المادة</th>
+                            <th>الحالة</th>
+                            <th>الدرجة</th>
+                            <th>التقدير</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody">
+                        <!-- Rows will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="security.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

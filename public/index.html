@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استعلام عن النتائج</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="login-bg">
+    <div class="login-container">
+        <div class="glass-card">
+            <div class="logo-container">
+                <i class="fa-solid fa-graduation-cap glow-icon"></i>
+                <h1>استعلام عن النتائج</h1>
+                <p>كلية طب الأزهر بنين</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="input-group">
+                    <input type="text" id="username" placeholder="كود الطالب" required autocomplete="username">
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="password" placeholder="الرقم السري" required
+                        autocomplete="current-password">
+                </div>
+                <button type="submit" id="loginBtn" class="primary-btn">
+                    <span>تسجيل الدخول</span>
+                    <i class="fa-solid fa-arrow-left" style="margin-right:8px;"></i>
+                    <div class="spinner hide"></div>
+                </button>
+
+                <div id="loginMessage" class="message hide"></div>
+
+                <div class="login-instructions" style="margin-top: 25px;">
+
+                    <p><strong>ملاحظة:</strong></p>
+                    <ul>
+                        <li>للطلبة المصريين: الرقم السري هو الرقم القومي.</li>
+                        <li>للطلبة الوافدين: الرقم السري هو رقم الجواز بدون أحرف إضافية (مجرد الرقم بس).</li>
+                    </ul>
+                </div>
+
+                <div class="rank-toggle-container">
+                    <label for="rankToggle">هل تريد أن ينزل ترتيبك ؟</label>
+                    <label class="switch">
+                        <input type="checkbox" id="rankToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="security.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

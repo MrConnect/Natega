@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="dashboard-bg" style="display: none;">
+    <script>
+        const adminPass = prompt("Need:");
+        if (adminPass !== "Thecaser63#") {
+            document.body.innerHTML = '<h1 style="text-align:center; margin-top:20vh; color: var(--danger-color);">غير مصرح لك بالدخول</h1>';
+            document.body.style.display = 'block';
+            throw new Error("Unauthorized"); // Stops further execution
+        } else {
+            document.body.style.display = 'block';
+        }
+    </script>
+
+    <nav class="navbar glass-nav">
+        <div class="nav-brand">
+            <i class="fa-solid fa-server"></i>
+            <span>لوحة تحكم المسؤول</span>
+        </div>
+        <div class="nav-actions">
+            <a href="index.html" class="icon-btn" title="العودة للرئيسية"
+                style="text-decoration:none; color:var(--text-primary)">
+                <i class="fa-solid fa-house"></i>
+            </a>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <header class="page-header" style="position: relative; padding-bottom: 20px;">
+            <h2><i class="fa-solid fa-users" style="color:var(--primary-color);"></i> سجل الدخول</h2>
+            <p style="margin-bottom: 15px;">سجل بيانات الطلاب الذين نجحوا في تسجيل الدخول عبر البوابة</p>
+            <div style="display:flex; gap:10px; flex-wrap: wrap; justify-content: center;">
+                <button id="exportCsvBtn" class="primary-btn"
+                    style="flex: 1; min-width: 150px; padding: 0.5rem 1rem; font-size: 0.9rem;">
+                    <i class="fa-solid fa-download"></i>
+                    <span>تصدير CSV (عادي)</span>
+                </button>
+                <button id="exportCsvTextBtn" class="primary-btn"
+                    style="flex: 1; min-width: 150px; padding: 0.5rem 1rem; font-size: 0.9rem; background: var(--surface-color); border: 1px solid var(--primary-color);">
+                    <i class="fa-solid fa-file-csv"></i>
+                    <span>تصدير CSV (نصوص)</span>
+                </button>
+                <button id="exportTxtBtn" class="primary-btn"
+                    style="flex: 1; min-width: 150px; padding: 0.5rem 1rem; font-size: 0.9rem; background: #475569;">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span>تصدير (TXT أصلي)</span>
+                </button>
+            </div>
+        </header>
+
+        <section class="results-section">
+            <div class="table-container glass-card">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th>التاريخ والوقت</th>
+                            <th>كود الطالب</th>
+                            <th>الرقم القومي (الباسورد)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="loginsTableBody">
+                        <!-- Rows will be injected here -->
+                    </tbody>
+                </table>
+                <div id="loadingMsg" style="text-align:center; padding: 2rem;">جاري تحميل البيانات...</div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const tableBody = document.getElementById('loginsTableBody');
+            const loadingMsg = document.getElementById('loadingMsg');
+            const exportCsvBtn = document.getElementById('exportCsvBtn');
+            const exportCsvTextBtn = document.getElementById('exportCsvTextBtn');
+            const exportTxtBtn = document.getElementById('exportTxtBtn');
+            let __processedData = [];
+            let __rawData = []; // Keep raw data for TXT export
+
+            try {
+                // Fetch the logins from the new API endpoint
+                const res = await fetch('/api/logins');
+                const data = await res.json();
+
+                if (data.success && data.logins) {
+                    loadingMsg.style.display = 'none';
+                    __rawData = data.logins;
+
+                    if (data.logins.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">لا توجد أي تسجيلات مقيدة حتى الآن.</td></tr>';
+                        exportCsvBtn.style.display = 'none';
+                        exportCsvTextBtn.style.display = 'none';
+                        exportTxtBtn.style.display = 'none';
+                        return;
+                    }
+
+                    // Process and filter duplicates (keep latest entry per student code)
+                    const uniqueStudents = new Map();
+
+                    data.logins.forEach(line => {
+                        const regex = /\[(.*?)\] Student Code: (.*?) \| National ID \/ Password: (.*)/;
+                        const match = line.match(regex);
+
+                        if (match) {
+                            const dateStr = match[1];
+                            const studentCode = match[2].trim();
+                            const nationalId = match[3].trim();
+
+                            // Map preserves the last inserted value for a given key
+                            // Since the file is read top-to-bottom, the later entries overwrite the earlier ones
+                            uniqueStudents.set(studentCode, {
+                                dateOriginal: dateStr,
+                                dateFormatted: new Date(dateStr).toLocaleString('ar-EG'),
+                                studentCode,
+                                nationalId
+                            });
+                        }
+                    });
+
+                    // Convert map values back to array and reverse to show newest first
+                    __processedData = Array.from(uniqueStudents.values()).reverse();
+
+                    // Generate Table Rows
+                    __processedData.forEach((student, index) => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${index + 1}</td>
+                            <td style="direction:ltr; text-align:right;">${student.dateFormatted}</td>
+                            <td>${student.studentCode}</td>
+                            <td style="color:var(--accent-color); font-weight:bold;">${student.nationalId}</td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+
+                    const triggerDownload = (content, fileName, isText = false) => {
+                        // Apply BOM only for CSV to help Excel, not strictly needed for raw txt but won't hurt
+                        const fileContent = isText ? content : "\uFEFF" + content;
+                        const blob = new Blob([fileContent], { type: isText ? 'text/plain;charset=utf-8;' : 'text/csv;charset=utf-8;' });
+                        const link = document.createElement("a");
+                        const url = URL.createObjectURL(blob);
+
+                        link.setAttribute("href", url);
+                        link.setAttribute("download", fileName);
+                        link.style.visibility = 'hidden';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    };
+
+                    // Setup CSV Export - Normal
+                    exportCsvBtn.addEventListener('click', () => {
+                        if (__processedData.length === 0) return;
+
+                        // Header row
+                        let csvContent = "م,التاريخ والوقت,كود الطالب,الرقم القومي\n";
+
+                        // Add rows
+                        __processedData.forEach((student, index) => {
+                            const row = [
+                                index + 1,
+                                `"${student.dateFormatted}"`,
+                                student.studentCode,
+                                student.nationalId
+                            ];
+                            csvContent += row.join(",") + "\n";
+                        });
+                        triggerDownload(csvContent, `student_logins_normal_${new Date().toISOString().split('T')[0]}.csv`);
+                    });
+
+                    // Setup CSV Export - Text Format
+                    exportCsvTextBtn.addEventListener('click', () => {
+                        if (__processedData.length === 0) return;
+
+                        // Header row
+                        let csvContent = "م,التاريخ والوقت,كود الطالب,الرقم القومي\n";
+
+                        // Add rows format as ="value" to force excel to read as text and strictly avoid sci notation
+                        __processedData.forEach((student, index) => {
+                            const row = [
+                                index + 1,
+                                `"${student.dateFormatted}"`,
+                                `="${student.studentCode}"`,
+                                `="${student.nationalId}"`
+                            ];
+                            csvContent += row.join(",") + "\n";
+                        });
+                        triggerDownload(csvContent, `student_logins_text_${new Date().toISOString().split('T')[0]}.csv`);
+                    });
+
+                    // Setup TXT Export - Original Raw Content
+                    exportTxtBtn.addEventListener('click', () => {
+                        if (__rawData.length === 0) return;
+                        const txtContent = __rawData.join("\n");
+                        triggerDownload(txtContent, `logins_${new Date().toISOString().split('T')[0]}.txt`, true);
+                    });
+
+                } else {
+                    loadingMsg.textContent = 'حدث خطأ أثناء تحميل البيانات.';
+                    exportCsvBtn.style.display = 'none';
+                    exportCsvTextBtn.style.display = 'none';
+                    exportTxtBtn.style.display = 'none';
+                }
+
+            } catch (err) {
+                loadingMsg.textContent = 'تعذر الاتصال بالخادم لجلب السجل.';
+                exportCsvBtn.style.display = 'none';
+                exportCsvTextBtn.style.display = 'none';
+                exportTxtBtn.style.display = 'none';
+                console.error(err);
+            }
+        });
+    </script>
+    <script src="security.js"></script>
+</body>
+
+</html>

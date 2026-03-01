@@ -1,0 +1,854 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="ctl00_Head1"><link rel="stylesheet" type="text/css" href="/DXR.axd?r=1_3-CeEj7" /><link rel="stylesheet" type="text/css" href="/DXR.axd?r=1_4-CeEj7" /><link rel="stylesheet" type="text/css" href="/DXR.axd?r=1_2-CeEj7" /><meta http-equiv="X-UA-Compatible" content="IE=9" /><meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="keywords" content="University Management Information System UMIS" /><meta name="description" />
+    <style type="text/css">
+        .auto-style2 {
+            width: 93px;
+            height: 37px;
+        }
+
+        .auto-style3 {
+            height: 37px;
+        }
+
+        .auto-style4 {
+            width: 93px;
+            height: 42px;
+        }
+
+        .auto-style5 {
+            height: 42px;
+        }
+
+        .auto-style6 {
+            height: 38px;
+        }
+    </style>
+
+    
+
+  
+    
+    <script src="../../JavaScript/JQuery/jquery-3.2.1.min.js"></script>
+    
+
+    <link href="../../App_Themes/AutoComplete.css" rel="stylesheet" type="text/css" /><link id="ctl00_Link1" href="../../App_Themes/style1.css" rel="stylesheet" type="text/css" /><link href="../../Style/JQuery/msgBoxLight.css" rel="stylesheet" type="text/css" /><link href="../../App_Themes/ui-progress-bar.css" rel="stylesheet" type="text/css" /><link href="../../Style/JQuery/jquery-ui-1.10.4.custom.css" rel="stylesheet" /><link href="../../App_Themes/telerikstyles.css" rel="stylesheet" type="text/css" />
+
+    <script src="../../JavaScript/Charts/jquery-1.10.2.min.js" type="text/javascript"></script>
+   	
+    
+    <script type="text/javascript" id="menujs" src="../../JavaScript/New_js/main.js"></script>
+    
+    <script type="text/javascript" src="../../JavaScript/New_js/jquery.collapse.js"></script>
+    
+    <script type="text/javascript" src="../../JavaScript/New_js/jquery.tinyscrollbar.min.js"></script>
+   <script type="text/javascript" charset="utf-8" src="../../JavaScript/New_js/nav.js"></script>
+    <script type="text/javascript" src="../../JavaScript/New_js/modernizr-2.6.1.min.js"></script>
+
+    <!-- Scripts -->
+    <script type="text/javascript" src="../../JavaScript/jquery.newsTicker.js"></script>
+    <script type="text/javascript" src="../../JavaScript/ClientSideTreePopupControl.js"></script>
+    <script type="text/javascript" src="../../JavaScript/AutoComplete.js"></script>
+    <script type="text/javascript" src="../../JavaScript/JQuery/jquery.msgBox.js"></script>
+    <script type="text/javascript" src="../../JavaScript/JQuery/msgBoxMethods.js"></script>
+ <script type="text/javascript">
+
+     var submit = 0;
+     function CheckDouble() {
+         if (++submit > 1) {
+             return false;
+         }
+     }
+     //start Marwa 12/4/2022 18213
+     function ValidNumeric1TO5(e) {
+         var charCode = (event.which) ? event.which : event.keyCode;
+         if (charCode >= 49 && charCode <= 53)
+         { return true; }
+         else
+         { return false; }
+     }
+     function ValidNumeric1TO3(e) {
+         var charCode = (event.which) ? event.which : event.keyCode;
+         if (charCode >= 49 && charCode <= 51)
+         { return true; }
+         else
+         { return false; }
+     }
+     //End Marwa 12/4/2022 18213
+     //eman moustafa Bug:15465
+     function Build() {
+         //alert(element_1);
+       
+     }
+ </script>
+    
+ 
+    <script language="javascript" type="text/javascript" defer="true">
+
+        function chkprint(divid) {
+            var panel = document.getElementById(divid);
+            var printWindow = window.open('', '', 'height=400,width=800');
+            printWindow.document.write('<html><head>');
+            printWindow.document.write('</head><body >');
+            printWindow.document.write(panel.innerHTML);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            setTimeout(function () {
+                printWindow.print();
+            }, 500);
+            return false;
+        }
+        //window.history.forward();
+        ////---prevent inspect element ---//
+        function ctrlShiftKey(e, keyCode) {
+            return e.ctrlKey && e.shiftKey && e.keyCode === keyCode.charCodeAt(0);
+        }
+        document.onkeypress = function (event) {
+            event = (event || window.event);
+            if (event.keyCode == 123) {
+                event.preventDefault();
+                return false;
+            }
+        }
+        document.onmousedown = function (event) {
+            event = (event || window.event);
+            if (event.keyCode == 123) {
+                return false;
+            }
+        }
+        document.onkeydown = function (e) {
+            event = (event || window.event);
+            if (//event.keyCode == 123
+                event.keyCode === 123 || ctrlShiftKey(e, 'I') || ctrlShiftKey(e, 'J') || ctrlShiftKey(e, 'C') ||
+                    (e.ctrlKey && e.keyCode === 'U'.charCodeAt(0))
+                ) {
+                return false;
+            }
+        }
+        if (document.all) {
+            document.onkeydown = function () {
+                var key_f5 = 116; // 116 = F5
+                if (key_f5 == event.keyCode) {
+                    event.keyCode = 0;
+                    //alert("Sorry! You can not refresh this page!");
+                }
+                //if (event.keyCode === 8) {
+                //    // try to cancel the backspace
+                //    return false;
+                //}
+            }
+        }
+
+        function hidestatus() {
+            window.status = ''
+            return true
+        }
+
+        if (document.layers)
+            document.captureEvents(Event.MOUSEOVER | Event.MOUSEOUT)
+
+        document.onmouseover = hidestatus;
+        document.onmouseout = hidestatus;
+
+        function CourseOpener(edCourseId) {
+            window.open('../../UI/Ed_Course/EntCoursePackageDtls.aspx?EdCourseId=' + edCourseId, '', 'toolbar=0,width=800,top=400,height=350,left=350,scrollbars=1');
+            return false;
+        }
+
+        function StudOpener(edStudId) {
+            window.open('../../UI/StaffView/StudData.aspx?EdStudId=' + edStudId, '', 'toolbar=0,width=950,height=500,left=350,scrollbars=1');
+            return false;
+        }
+        function StaffOpener(saStfMemberId) {
+            window.open('../../UI/StaffView/StaffData.aspx?ParamSaStfMemberId=' + saStfMemberId, '', 'toolbar=0,width=600,top=300,height=300,left=350,scrollbars=1');
+            return false;
+        }
+
+        function ToggleMenuDisplay() {
+
+            var elem = document.getElementById("hideShow");
+            if (elem.style.display == "none") {
+                elem.style.display = "block";
+                document.getElementById("rightCol").style.width = "700px";
+                document.getElementById("spanShowHide").innerText = 'إخفاء';
+            }
+            else {
+                elem.style.display = "none";
+                document.getElementById("rightCol").style.width = "100%";
+                document.getElementById("spanShowHide").innerText = 'عرض';
+            }
+
+            SaveMenuStatus();
+        }
+
+        function getItem(parent, tagName) {
+            if (parent == null)
+                return null;
+
+            var item = parent.firstChild;
+            do {
+                if (item.tagName == tagName)
+                    return item;
+            } while (item = item.nextSibling);
+            return null;
+        }
+        function showSubMenu(src, show) {
+
+            var firstItem = getItem(document.getElementById("ctl00_mnuMain"), "UL");
+            firstItem = getItem(firstItem, "UL");
+            firstItem = getItem(firstItem, "LI");
+            var itemStyle = null;
+
+            if (firstItem) {
+                if (firstItem.currentStyle)
+                    itemStyle = firstItem.currentStyle;
+                else if (window.getComputedStyle)
+                    itemStyle = window.getComputedStyle(firstItem, null);
+            }
+
+            var display = (show) ? "block" : "none";
+            var link = getItem(src, "A");
+            var submenu = getItem(src, "UL");
+
+            if (link != null) {
+                link.style.color = (show && itemStyle) ? itemStyle.color : "";
+                link.style.backgroundColor = (show && itemStyle) ? itemStyle.backgroundColor : "";
+            }
+
+            if (submenu != null)
+                submenu.style.display = display;
+        }
+
+        function hsb_menu(args) {
+            var nodes = args.parentNode.childNodes;
+            for (var i = 0; i < nodes.length; i++) {
+                if (nodes.item(i).className == "") {
+                    if (nodes.item(i).style.display == "" || nodes.item(i).style.display == "block")
+                        nodes.item(i).style.display = "none";
+                    else
+                        nodes.item(i).style.display = "block";
+                }
+            }
+            SaveMenuStatus();
+        }
+
+    </script>
+    <style>
+          /*div[id$="_PW-1"] {
+            position: fixed !important;
+        }*/
+
+            .Search {
+              width: 55%;
+              font-size: 16px;
+              padding: 5px 20px 5px 40px;
+              border: 1px solid #ddd;
+              margin: 8px;
+            }
+    </style>
+    <title>
+	النظام الفرعى للطالب
+</title><link href="../../App_Themes/NewTheme_1_Ar/lotus.css" type="text/css" rel="stylesheet" /><link href="../../App_Themes/NewTheme_1_Ar/style.css" type="text/css" rel="stylesheet" /><link href="/WebResource.axd?d=Xnb6Tg7cngEVg2UP3JuGrvjX0vDxYL994peqNr7NWo3HAZRg8nXnXu1jqQFhbYACtYg2v_x959fXtFO94xwPGZY4kw5li0vx13Syz62uJXKNMHhrv2D6q9fRKwZpiUdkzI10LAxswu3gRRb7tC4cz6bdbcms01nJCSq3-ZvlULM1&amp;t=633399536860000000" type="text/css" rel="stylesheet" /></head>
+<body>   
+    <form name="aspnetForm" method="post" action="./student_sem_work_Modular.aspx" id="aspnetForm">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="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" />
+
+
+<script src="/WebResource.axd?d=xE9PzR9_jmr07G24hW6MH7eHNksMxDOMblQakTJpmoEy0A8BXhg9MtrjJOGDG-9h1dA7n3ns-CQ08bMyudIbfYpmJZjd_1YghHeIzZGvsw9vKsFkhNLxEbOQDIDpR9zpM9aBm_T2dGcSNr1IvItteQ2&amp;t=635130892720000000" type="text/javascript"></script>
+<script src="/WebResource.axd?d=UA3ZYpvmWtYPyT0vkQ07Itc3eJB_1rhFqYaiO8gTgKU46Xmx1Lk26l92eGnXT2DAp776BDvRtQVLHyJe6eSsu_a_OtkwF-lBWko5IhG87oio9fWWBjqzJx1o2GG-WdgeUbs8TdXo3hqZyf4XB3cH6Q2&amp;t=635130892720000000" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=sIePCNucZefu4KQkG7304v_f8zh7RtYDIh3Y-Uc7_lWtrp5she-7GtM5qz5K-nyqVM9k20yfss6U-SyoGVAWoP--r_aKtk9XUlgbbikLplgVqxUWK2ME_UocGdROMZd6nB0hNY_gdjNt8rCMgiX2ckIkm_a7hLdQQxHcPDFiCr41&amp;t=74a40145" type="text/javascript"></script>
+<script src="../../Javascript/webkit.js" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=i4E3lqoypfQWAanxaw94iYF-BzVsBpBfN-xNiCEvoJDQt-GS2CGehtOA1yrgI2dZZJgz9iPrFUl_q-lGINc2kYPZjzyNBH_N2P33MRgnIGgKwIGnmRMNQq4ApaAuHGTyxoGnWEEDe7Y6_58Rx4-9xQ2&amp;t=ffffffffe6cf0363" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=XMNqMTrfOIlaPHNqvUp4BV3eOh1W9AK9Rxelqsls-6gVgRdNbxSwanFGtmCJD4utW1uXbl9usHuEFCo6oRoRUsH5OHl_HJoOrOBeRrp_Ht1rizh8enIzjgyMI-BqU1GYVFqt1tiWwE3CpmZuf1OBW4gwwiE4ZpQyPYd_zul5yQU1&amp;t=ffffffffc7a6ddb0" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=LfsjGNhN1X5lDOl2u7BQhHtWM72nMPxZ_0fFT6rVSdmveYwz0ewfbOqDzqXGGftD9I21xLRSwpH6cjnZtwA6Ut6sXM5MUcdt2hWhcQeAVAWuMdKz49iNlHJ2twu0HSoqEzeqUUQ0zdsNRDHnIXjlmJdsDebIxici4CC_hlmydyg1&amp;t=ffffffffc7a6ddb0" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=lkkgJuKxZlFu3S9100Mx2b4sQxdE3iYsv8HsGX7d0maHY7_nEOeSRUoZzEZLQhM_pc4BZSDyQUfd3_cgAayx5qtam_VoNur4nxJCqeHSX3ZVI16y35VUUFlpsa9E5yxZHsxjmBqzPBak_smFXsO26rzNPMr0gjHN1wOdqSQVD_w1&amp;t=ffffffffc7a6ddb0" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=s1Qf4HsKKXFVlFUubjLNsULsxvjGexbWddXuDtIpOuOl1qHW77lg14PYFkBgwTnIB0-8KrvKVfw2ebARR9mHlqk0TWGXETuGdfOjnR_o1tJN-wDLOckgW9KShtKIhB57QFagKieD2YPmqWk5lU6WRFaGB49GHzWLZ2LSezU18Y45xD9KhBNMsK5u8qV_XMyV0&amp;t=ffffffffc7a6ddb0" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=WnyQuk8Ljf1pksAkGAOzy8qq9V8AZzmJpHz2_SQRk1lEkfEjR1ANxLbAa23y8nUvJCe-BNxazLrnzPzl-SA_JnPikPaToauH3F9pHgD5nRxhm2k0w5BrrMhEsQHTVzPpCsysSVVvQgAIyj9sM1m5pjwyuIIgzm_3YJxlzxr0xR92LZqfMgei1XLdCarujz-t0&amp;t=ffffffffc7a6ddb0" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=aAls-58SqHuQa0KT1xRKJx6ZeCaTusNAnYMr6r9QJl9ETknRc0uEO5S2XokfNh-4hm0NXsP_No2IH4YI60rC3e41zGbl8WbQOAXdTNOfFCCFHsY_ib_aZ89w08ZzqtLQ-QgudCeMJUdIj48h_wPvYPcn2bbgpccKDaTjVzqRuoQ1&amp;t=ffffffffc7a6ddb0" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=HAIs-Gu6m1XBKXCc-p5lOoS2sAvAQHqFsitHRd2B3exsd0fkhsaR66KEU8drOwRxH5qYzKsVOMJ5IQ0YFMmZznRtHwP-9YMuTogD_nzTj2iNHm41juI17wMnMwfWtE2YRCUIOlthsRdO76rkKumxZ9p94LPXMCVQEAgAIVKmXgI1&amp;t=ffffffffc7a6ddb0" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=4esdYDBaQA78LWdeYjULyKZ7qyxxH2YIcDL25YnHI_5mEh7rmJ1PPjtGWNmbtdHEXIolp2Cs6rdaaNgJc7iXW_RMsAnV5GOp-U3tbQAsDJg_m9bqgrEABCeRgjf4ecXS1GQG4TjN_CYovrQBD_b8wZTFt5QPGJe0fhcpzNfWRSY1&amp;t=ffffffffc7a6ddb0" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=vYrmVzlTsXlWNuEK4py1yiyoiyUfJAwpn95TB5fp2yYg8E2Z3-OCXIp6fJNX8oUL6e5CLVj-0li2amXlKx4jedKwZNuV4zIwHZK8KRcGjE2z2w9qC-0T5qCib4w0Kite71VZUzzhk3PyVg_aWMEnV9CR8GjItKQK6hBVc9azV_41&amp;t=ffffffffc7a6ddb0" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=6ETC-vgEFPdGN9eZaMisRWKYqdsNtpBOQqAkk03fWQXxrU-s9KOH6kBSwnG5fknP7Gbjyn-zsx9c_9SkyKZXVdXsBIyLDsyS-lWpkOyQJXL5XDx5bUAQJUh-DLEMZR1NnEFvWccnta5aOqWDbsYFmAnTB8Cg-Twi7IfhkvZOY_81&amp;t=ffffffffc7a6ddb0" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=k73Q7MXDOVkWo1wucVmBs0gnlCmz7n7_xNkLi_KF5S54cYMghTNoHe2CYAy6_C1qg6XX3XKB1sKdYpd8lbugZ9UVcGadMWdPKG-qmwTRDbCodNIE1AbcUZSA6vFr8QjWKneLqyMHAIPAHR1x7qEAp9Kw3nCZFE_fdSJa1cLTe-I1&amp;t=ffffffffc7a6ddb0" type="text/javascript"></script>
+<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="E9068E6F" />
+<input type="hidden" name="__VIEWSTATEENCRYPTED" id="__VIEWSTATEENCRYPTED" value="" />
+<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="OzuKTNmHH75JLbBV2Pg22GUhJHACxzqQ5oI9aTCw0Vx8rrCOFcHuvdbn4rf6te213t22In/FW+Is72tJAFa69fV6+Jpv8PEETuGHWC2RadX9FDiZAIrcDb2ZL2oo9+PE895gUV5eJFSISdTc3YBKww0cxPjAR2pPkKjNZJVqrQUZOutG1qrjj4uOnCY4mB3hJACVeSdL6qidLSksocBmasxXKxu2qD27Iy/KrqUL3KKGlrcp3f6vaHhL1QiU168Y5pQ68z5jq8RtMnJo1+i84sVDg3RFKMlsZxVww2RwnJzYjD6M1chW433k5rSX3A/EJI20dh05ZbmOu7oL7k3/i2epaCccTDONM8y0qIRb9pe9/pFkpUqR8m7mzq4SLL4AIHIyDn+HPXzFbCzfkinVtZIJVNPnc58vt8SZVqzaBkn/+lozMIZAUW1aD++HWQGG8S7wtpNnWyeaCUI6LT4DguXCBFjEPBzcY7sRftzaYal1CPXEqoBZ5OLNv5SDKAepdvvx6t42kyEqexm7lBfLO7CVI+8rVWvVC64yp+ndHL9WFfv/26xB9lCStvZ1o6owCmgkBBoOtrqqeYQXyHk7vsTstjKiFdP4Mv/wLByjaX0Mbmv9txQ4GoJ/aMVk6TSpz7qAcH6KyBKYTrzu0aA0MP8qT16J/MCl3EDXCZm+87hOHMwGitn02S8KSzC07IgVK8UH5MAHZBNq24fN+dpJxSo3zMo0ke5GGxqfVsT/vhLUC0KBkQlzUTGlTIBLmbVeUl8flKNKgLSVwLhu8N0xyj5Cv1r06UU9Z3X7NAwc0c4Fyk7S5N7y6EBMP4LA3iIXa4IKXJ+lz7bKJpjE9FcMRbOs8K8yTnLUMoLgaJQnU/A=" />
+        
+        <input type="hidden" id="ctl00_ASPxPopupControl1WS" name="ctl00_ASPxPopupControl1WS" value="0:0:-1:-10000:-10000:0:-10000:-10000:1" /><script id="dxis_1458950327" src="/DXR.axd?r=1_42-CeEj7" type="text/javascript"></script><script id="dxis_970066940" src="/DXR.axd?r=1_74-CeEj7" type="text/javascript"></script><script id="dxis_485897956" src="/DXR.axd?r=1_67-CeEj7" type="text/javascript"></script><script id="dxis_485864193" src="/DXR.axd?r=1_64-CeEj7" type="text/javascript"></script><div id="ctl00_ASPxPopupControl1_PW-1" style="position:absolute;left:0px;top:0px;z-index:10000;visibility:hidden;display:none;">
+	<table id="ctl00_ASPxPopupControl1_PWST-1" cellspacing="0" cellpadding="0" border="0" style="border-collapse:separate;position:relative;">
+		<tr>
+			<td class="dxpcControl" onmousedown="aspxPWMDown(event,&#39;ctl00_ASPxPopupControl1&#39;,-1,false)" width="200" style="cursor:default;"><table id="ctl00_ASPxPopupControl1_CLW-1" cellspacing="0" cellpadding="0" border="0" width="200" style="border-collapse:separate;">
+				<tr>
+					<td id="ctl00_ASPxPopupControl1_PWH-1" class="dxpcHeader" style="padding-left:12px;padding-right:2px;padding-top:2px;padding-bottom:2px;"><table cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:separate;">
+						<tr>
+							<td class="dxpc" width="100%">Header</td><td style="padding-left:4px;"><table cellspacing="0" cellpadding="0" border="0" style="border-collapse:separate;">
+								<tr>
+									<td id="ctl00_ASPxPopupControl1_HCB-1" class="dxpcCloseButton" onclick="aspxPWCBClick(event, &#39;ctl00_ASPxPopupControl1&#39;,-1)" onmousedown="return aspxPWCBMDown(event);" style="cursor:pointer;"><img id="ctl00_ASPxPopupControl1_HCB-1Img" class="dxWeb_pcCloseButton" src="/DXR.axd?r=1_5-CeEj7" alt="[Close]" title="" /></td>
+								</tr>
+							</table></td>
+						</tr>
+					</table></td>
+				</tr><tr>
+					<td id="ctl00_ASPxPopupControl1_PWC-1" class="dxpcContent" style="border-top-width:0px;"><div id="ctl00_ASPxPopupControl1_CSD-1" class="dxpcContentPaddings">
+						&nbsp;
+					</div></td>
+				</tr>
+			</table></td><td id="ail651980339" style="background:url('/DXR.axd?r=1_25-CeEj7') no-repeat left top;//background:none;"><script id="dxss_1877271534" type="text/javascript">
+<!--
+
+    _aspxEnsureAlphaImageLoaderApplierRegistered();    
+    _aspxAddAlphaImageLoaderTarget("ail651980339", "/DXR.axd?r=1_25-CeEj7");
+
+//-->
+</script></td>
+		</tr><tr>
+			<td id="ail371190121" style="background:url('/DXR.axd?r=1_24-CeEj7') no-repeat left top;//background:none;"><script id="dxss_1788928514" type="text/javascript">
+<!--
+
+    _aspxEnsureAlphaImageLoaderApplierRegistered();    
+    _aspxAddAlphaImageLoaderTarget("ail371190121", "/DXR.axd?r=1_24-CeEj7");
+
+//-->
+</script></td><td id="ail770683130" style="background:url('/DXR.axd?r=1_26-CeEj7') no-repeat left top;//background:none;"><div>
+
+			</div><script id="dxss_419639430" type="text/javascript">
+<!--
+
+    _aspxEnsureAlphaImageLoaderApplierRegistered();    
+    _aspxAddAlphaImageLoaderTarget("ail770683130", "/DXR.axd?r=1_26-CeEj7");
+
+//-->
+</script></td>
+		</tr>
+	</table>
+</div><iframe id="ctl00_ASPxPopupControl1_DXPWIF-1" src="javascript:false" scrolling="no" frameborder="0" style="position:absolute;display:none;z-index:9999;filter:progid:DXImageTransform.Microsoft.Alpha(Style=0, Opacity=0);">
+
+</iframe><script id="dxss_504156860" type="text/javascript">
+<!--
+aspxAddHoverItems('ctl00_ASPxPopupControl1',[[['dxpcCloseButtonHover'],[''],['HCB-1'],,[['']],['Img']]]);
+
+var dxo = new ASPxClientPopupControl('ctl00_ASPxPopupControl1');
+window['ctl00_ASPxPopupControl1'] = dxo;
+dxo.uniqueID = 'ctl00$ASPxPopupControl1';
+dxo.renderIFrameForPopupElements = true;
+dxo.isPopupPositionCorrectionOn=false;
+dxo.width=0;
+dxo.height=0;
+dxo.InlineInitialize();
+
+//-->
+</script>
+        <!-- needed to fix Numeric box and calendar-->
+        <div style="display: none;">
+            <input name="ctl00$FixNumericBoxProblem" type="text" id="ctl00_FixNumericBoxProblem" onchange="NumericBox_FindItem(&#39;ctl00_FixNumericBoxProblem&#39;).OnTextChange(this);" />
+            <input name="ctl00$txtFixCalendarProblem" type="text" id="ctl00_txtFixCalendarProblem" class="gridTextBox" />
+            <input type="image" name="ctl00$btnFixCalendarProblem" id="ctl00_btnFixCalendarProblem" src="../../Images/calender.bmp" align="absmiddle" border="0" />
+            <input type="hidden" name="ctl00$MaskedBirthDate_ClientState" id="ctl00_MaskedBirthDate_ClientState" />
+            
+           &nbsp;
+
+        </div>
+
+        <script language="javascript" type="text/javascript">
+
+            function ShowTree(sender) {
+
+                var rootPath = sender.parentNode.parentNode.parentNode.parentNode.id.replace("_EntityTreeTable", "_");
+
+                var url = '/UI/ENTITY_MAIN/SelectTreeDlg.aspx';
+                var params = "";
+                var style = "center:1;scroll=0;status:0;dialogWidth:350px;dialogHeight:400px";
+
+                var faculty = document.getElementById(rootPath + "hidFacultyEntityMainId").value;
+                if (faculty != "")
+                    params += ((params == "") ? "" : "&") + "FacultyEntityMainId=" + faculty;
+
+                var entMainId = document.getElementById(rootPath + "hidEntityMainId").value;
+                if (entMainId != "")
+                    params += ((params == "") ? "" : "&") + "EntMainId=" + entMainId;
+
+                var expandedNodes = document.getElementById(rootPath + "hidExpandedNodes").value;
+                if (expandedNodes != "")
+                    params += ((params == "") ? "" : "&") + "ExpandedNodes=," + expandedNodes;
+
+                if (params != "")
+                    url += "?" + params;
+                var ret = window.showModalDialog(url, null, style);
+
+                if (ret != null) {
+                    var hasChanged = (document.getElementById(rootPath + "hidEntityMainId").value != ret.EntMainID);
+                    document.getElementById(rootPath + "hidEntityMainId").value = ret.EntMainID;
+                    document.getElementById(rootPath + "txtPath").value = ret.EntMainName;
+                    document.getElementById(rootPath + "hidExpandedNodes").value = ret.ExpandedNodes;
+
+                    if (hasChanged) {
+                        document.getElementById(rootPath + "btnPostback").click();
+                    }
+                }
+            }
+        </script>
+        <script type="text/javascript">
+
+            $(document).ready(function () {
+                //--- prevent inspect element ----//
+                document.addEventListener("contextmenu", function (e) {
+               //  e.preventDefault();
+                }, false);
+                try {
+                    $('#scrollbar_help').tinyscrollbar();
+                    $('#scrollbar_menu_left').tinyscrollbar();
+                }
+                catch (SS) { }
+
+
+                var oldids = '';
+                $("div[id*='_PG_UG_ASPxRoundPanel']").each(function (i, el) {
+                    oldids = oldids + (el.id.replace('_PG_UG_ASPxRoundPanel', '').replace('ctl00_cntphmaster_', '')) + ',';
+                    //.substring(el.id.indexOf('DegreeClassCtrl'))
+                    console.log(oldids);
+                });
+
+                if (oldids.length > 1) {
+
+                    var oldtextvalue = $('#ctl00_txthdndegreeclassctrl_Ids').val();
+
+                    
+                    oldids = oldids.substring(0, (oldids.length - 1));
+
+                    $('#ctl00_txthdndegreeclassctrl_Ids').val(oldids);
+
+                    console.log($('#ctl00_txthdndegreeclassctrl_Ids').val());
+
+                    if (oldtextvalue == "0")
+                        __doPostBack();
+                    //}
+                }
+            });
+
+            //$(document).ready(function () {
+
+
+            //});
+
+            //$(document).ready(function () {
+            //    $('#scrollbar_all_info').tinyscrollbar();
+            //});
+
+            Sys.WebForms.PageRequestManager.getInstance().add_endRequest(EndRequestHandler);
+            function EndRequestHandler(sender, args) {
+                RunScriptForScroll();
+            }
+
+
+            function RunScriptForScroll() {
+                //            $(document).ready(function () {
+                //                $('#scrollbar_all_info').tinyscrollbar();
+                //            });
+            }
+
+        </script>
+        <!----------------------------------------------------jquery-scrollbar------------------->
+        <div id="wrapper">
+            <div id="left-menu" class="MenuHide">
+                <div id="scrollbar_menu_left">
+                    <div class="scrollbar">
+                        <div class="track">
+                            <div class="thumb">
+                                <div class="end">
+                                </div>
+                                <!--end-->
+                            </div>
+                            <!--thumb-->
+                        </div>
+                        <!--track-->
+                    </div>
+                    <!--scrollbar-->
+                    <div class="viewport">
+                        <div class="overview">
+                            <div id="menu_left">
+                                <div id="accordion-example" data-collapse="accordion">
+                                    
+                                </div>
+                                
+                                <input name="ctl00$txtSearch" type="text" id="ctl00_txtSearch" class="Search" onkeyup="searchMenue()" placeholder="بحث" />
+                                
+                                <!--accordion-->
+                                <nav><ul id='nav'><li><a class='nav_MNU' href='#'>&raquo;&nbsp; استعراض</a><ul><li><a class='nav_URL' href='http://studentportalsis.azu.edu.eg/UI/ED_COURSE/CourseBool_View.aspx'>&raquo;&nbsp; قائمة المقررات</a></li></ul></li><li><a class='nav_MNU' href='#'>&raquo;&nbsp; الشئون الاكاديمية</a><ul><li><a class='nav_URL' href='http://studentportalsis.azu.edu.eg/UI/StudentViewAdmin/STD_CRS_REG_PLN_Grouping.aspx'>&raquo;&nbsp; إضافة/حذف/إنسحاب من مقرر</a></li><li><a class='nav_URL' href='http://studentportalsis.azu.edu.eg/UI/StudentView/student_sem_work.aspx'>&raquo;&nbsp; نتيجة فصل دراسي</a></li></ul></li><li><a class='nav_MNU' href='#'>&raquo;&nbsp; الخدمات الالكترونية</a><ul><li><a class='nav_URL' href='http://studentportalsis.azu.edu.eg/UI/UOB_Alumni/Inbox.aspx'>&raquo;&nbsp; صندوق الوارد</a></li><li><a class='nav_URL' href='http://studentportalsis.azu.edu.eg/UI/StudentView/CourseEvaluation.aspx'>&raquo;&nbsp; إستبيان مقرر</a></li></ul></li><li><a class='nav_MNU' href='#'>&raquo;&nbsp; التقارير</a><ul><li><a class='nav_URL' href='http://studentportalsis.azu.edu.eg/UI/StudentView/StudExamScheduleReport_UOB.aspx'>&raquo;&nbsp; جدول امتحانات المقررات</a></li><li><a class='nav_URL' href='http://studentportalsis.azu.edu.eg/UI/Modular/RPT_MOD_STUD_SCHDL.aspx'>&raquo;&nbsp; الجدول الدراسى للطالب</a></li><li><a class='nav_URL' href='http://studentportalsis.azu.edu.eg/UI/StudentView/StudCourseTimeReport_UOB.aspx'>&raquo;&nbsp; الجدول الدراسي للطالب</a></li></ul></li><li><a class='nav_HIDE' href='#'></a></li><li><a class='nav_HIDE' href='#'></a></li><li><a class='nav_HIDE' href='#'></a></li><li><a class='nav_HIDE' href='#'></a></li><li><a class='nav_HIDE' href='#'></a></li><li><a class='nav_HIDE' href='#'></a></li><li><a class='nav_HIDE' href='#'></a></li><li><a class='nav_HIDE' href='#'></a></li><li><a class='nav_HIDE' href='#'></a></li><li><a class='nav_HIDE' href='#'></a></li><li><a class='nav_HIDE' href='#'></a></li><li><a class='nav_HIDE' href='#'></a></li><li><a class='nav_HIDE' href='#'></a></li></ul></nav>
+                            </div>
+                            <!--menu_left-->
+                        </div>
+                        <!--overview-->
+                    </div>
+                    <!--viewport-->
+                </div>
+            </div>
+            <!--scrollbar_menu_left-->
+
+            <div id="content-wrapper">
+                <div id="top_header">
+                    <div class="holder">
+                        <div id="logo_text">
+                            <div id="logo">
+                                <img src="../../images/logo_Pages.png" id="ctl00_univImg" />
+                            </div>
+                            
+                            <!--logo-->
+                            <div id="namelogo">
+                                
+                            </div>
+                            <!--namelogo-->
+                        </div>
+                        <!--logo_text-->
+                        <div id="welcome">
+                            <div id="name_welcome">
+                                <p>
+                                    &nbsp;|&nbsp;النظام الفرعى للطالب
+                                </p>
+                                <p>
+                                    &nbsp;<span id="ctl00_lblUser" title="120240002236"><font color="#333333"><span style='font-size:9px'>محمد السيد احمد احمد مرزوق</span></font></span>
+                                </p>
+                                <h2>
+                                    <span id="ctl00_lblWelcome"><font color="#333333">مرحباً</font></span></h2>
+                            </div>
+                            <!--name_welcome-->
+                            <div class="logo_Text">
+                                كلية طب بنين القاهرة
+                            </div>
+                            <div id="admin">
+                                <p>
+                                    <span id="ctl00_lblAdmYear"><font color="#333333">2025/2026</font></span>
+                                    &nbsp;-&nbsp;
+                                <span id="ctl00_lblAdmSem"><font color="#333333"></font></span>
+                                </p>
+                            </div>
+                            <!--admin-->
+                        </div>
+                        <!--welcome-->
+                    </div>
+                    <!--holder-->
+                </div>
+                <!--top_header-->
+                
+
+                <div class="all_menu">
+                    <div class="holder">
+                        <div class="menu_master_icons">
+                            <ul class="all_master_icons">
+
+                                <li class="image_menu">
+                                    <a href="#" id="menu" onclick="javascript:window.scroll(0,0);" class="ico fl">
+                                        <img src="../../images/menu.png" id="ctl00_Img9" /></a>
+                                </li>
+
+
+                                <li class="home_title_page">
+                                    
+                                    <span id="ctl00_lblPageTitle">كشف نتيجة فصل دراسى</span>
+                                </li>
+                                <li>
+                                    <script type="text/javascript">
+                                        function TickerJS() {
+                                            var options = {
+                                                newsList: "#newsTicker",
+                                                startDelay: 5,
+                                                placeHolder1: "_"
+                                            };
+
+                                            $().newsTicker(options);
+                                        }
+                                        (function ($) {
+                                            function runTicker(settings) {
+                                                if (settings.firstRun == 1) {
+                                                    currentLength = settings.currentLength;
+                                                    currentItem = settings.currentItem; settings.firstRun = 0
+                                                }
+                                                if (currentItem == settings.newsItemCounter + 1) {
+                                                    currentItem = 0
+                                                } if (currentLength == 0) {
+                                                    $(settings.newsList).empty().append('<li><a href="' + settings.newsLinks[currentItem] + '"></a></li>')
+                                                } if (currentLength % 2 == 0) { placeHolder = settings.placeHolder1 } else {
+                                                    placeHolder = settings.placeHolder2
+                                                } if (currentLength <= settings.newsItems[currentItem].length + 1) {
+                                                    var tickerText = settings.newsItems[currentItem].substring(0, currentLength); $(settings.newsList + ' li a').text(tickerText + placeHolder); currentLength++; setTimeout(function () { runTicker(settings); settings = null }, settings.tickerRate)
+                                                } else { $(settings.newsList + ' li a').text(settings.newsItems[currentItem]); currentLength = 0; currentItem++; setTimeout(function () { runTicker(settings); settings = null }, settings.loopDelay) }
+                                            } $.fn.extend({ newsTicker: function (settings) { settings = jQuery.extend({ newsList: "#news", tickerRate: 80, startDelay: 500, loopDelay: 2000, placeHolder1: " |", placeHolder2: "_" }, settings); var newsItems = new Array(); var newsLinks = new Array(); var newsItemCounter = 0; $(settings.newsList + ' li a').each(function () { newsItems[newsItemCounter] = $(this).text(); newsLinks[newsItemCounter] = $(this).attr('href'); newsItemCounter++ }); settings = jQuery.extend(settings, { newsItems: newsItems, newsLinks: newsLinks, newsItemCounter: newsItemCounter - 1, currentItem: 0, currentLength: 0, firstRun: 1 }); setTimeout(function () { runTicker(settings); settings = null }, settings.startDelay) } })
+                                        })(jQuery);
+                                        $(document).ready(function () {
+                                            try {
+                                                TickerJS();
+                                            }
+                                            catch (ex) { }
+                                        });
+                                    </script>
+                                    <div id="ctl00_news" class="Ticker" style="display:none;">
+                                        <ul id='newsTicker' class='Ticker'><li><a href='#'>SIS - University of Bahrain</a></li></ul>
+                                    </div>
+                                </li>
+                                <li class="master_icons">
+                                    <div id="language">
+                                        <a id="ctl00_lnkLogout" onclick="javascript:eraseCookie();" href="../../ClearSession.ashx?Type=Admission&amp;ID=41237"><img src="../../images/out.png" id="ctl00_Img6" title="تسجيل الخروج" /></a>
+                                    </div>
+                                </li>
+                             
+
+                                <li class="master_icons">
+                                    <div id="Div4">
+                                        <a id="ctl00_lnkChngPSW" href="../Admission/ChngPassword.aspx"><img src="../../images/Key.png" id="ctl00_Img8" title="تغيير كلمة السر" /></a>
+                                    </div>
+                                </li>
+                                <li class="master_icons">
+                                    <div id="ctl00_Div5">
+                                        <a id="ctl00_Lnk_Dashbord" href="https://sisdashboard.azu.edu.eg/?embed=true&amp;UserName=umisadmin&amp;FacID=0" target="_blank"><img src="../../App_Themes/images/Chart.png" id="ctl00_imgdashbord" title="DashBord" width="30" height="30" /></a>
+                                    </div>
+                                </li>
+                                <li class="master_icons">
+                                    <div id="Div3">
+                                        <a id="ctl00_lnkAr" class="Link" href="javascript:__doPostBack(&#39;ctl00$lnkAr&#39;,&#39;&#39;)"><img src="../../images/arabic.png" id="ctl00_Img4" title="عربي" /></a>
+                                    </div>
+                                </li>
+                                <li class="master_icons">
+                                    <div id="Div2">
+                                        <a id="ctl00_lnkEn" class="Link" href="javascript:__doPostBack(&#39;ctl00$lnkEn&#39;,&#39;&#39;)"><img src="../../images/engilsh.png" id="ctl00_Img5" title="English" /></a>
+                                    </div>
+                                </li>
+                                <li class="master_icons">
+                                    <div id="Div1">
+                                        <a id="ctl00_lnkHome" href="Home.aspx"><img src="../../images/home.png" id="ctl00_Img1" title="الصفحة الرئيسية" /></a>
+                                    </div>
+                                </li>
+                                 <li class="master_icons">
+                                    
+                                </li>
+                                 <li class="master_icons">
+                                    <div id="Div_NewTask" >
+                                        <a id="ctl00_lnkNewTask" style="display:none;"><img src="../../Images/TaskNew.png" id="ctl00_Img7" width="30" height="30" title="صفحة المهام" /></a>
+                                    </div>
+                                </li>
+                            </ul>
+                            <!--all_master_icons-->
+
+                        </div>
+                        <!--menu_master_icons-->
+                        <div id="Div300" style='float: left; display: inline-block;'>
+                            
+                        </div>
+
+                        <!-- /header -->
+                    </div>
+                </div>
+
+                <!--holder-->
+                
+                <!--navigation-->
+                <div id="all_content">
+                    <div class="holder">
+                        <div id="all_info">
+
+                            <div id="scroll_all_info">
+                                <div id="scrollbar_all_info">
+                                    
+                                    <!--scrollbar-->
+                                    
+                                    
+    <input type="hidden" name="ctl00$cntphmaster$hf_ISModular" id="ctl00_cntphmaster_hf_ISModular" value="1" />
+    <div id="ctl00_cntphmaster_Panel2" class="all_details">
+	
+        <table>
+            <tr>
+                <td class="all_grid_form_name">
+                    <span id="ctl00_cntphmaster_lblAcadYear"><font color="#333333">العام الجامعى</font></span>
+                </td>
+                <td class="input_normal">
+                    <select name="ctl00$cntphmaster$ACadYearDropDownList" id="ctl00_cntphmaster_ACadYearDropDownList">
+		<option selected="selected" value="16">2025/2026</option>
+		<option value="15">2024/2025</option>
+		<option value="14">2023/2024</option>
+		<option value="13">2022/2023</option>
+		<option value="12">2021/2022</option>
+		<option value="11">2020/2021</option>
+		<option value="10">2019/2020</option>
+		<option value="9">2018/2019</option>
+		<option value="8">2017/2018</option>
+		<option value="7">2016/2017</option>
+		<option value="6">2015/2016</option>
+		<option value="5">2014/2015</option>
+		<option value="4">2013/2014</option>
+		<option value="3">2012/2013</option>
+		<option value="2">2011/2012</option>
+		<option value="1">2010/2011</option>
+
+	</select>
+                    
+                </td>
+
+            </tr>
+            <tr>
+                <td class="all_grid_form_name">
+                    <span id="ctl00_cntphmaster_lblSemester"><font color="#333333">الفصل الدراسي</font></span>
+
+                </td>
+                <td class="input_normal">
+                    <select name="ctl00$cntphmaster$semesterDropDownList" id="ctl00_cntphmaster_semesterDropDownList">
+		<option selected="selected" value="1">أول</option>
+		<option value="2">ثانى</option>
+		<option value="3">صيفى</option>
+		<option value="4">معادلة</option>
+		<option value="11">أول معادلة</option>
+		<option value="12">ثانى معادلة</option>
+		<option value="13">صيفى معادلة</option>
+
+	</select>
+                    
+                </td>
+
+            </tr>
+            <tr id="ctl00_cntphmaster_tr_ExamType">
+		<td class="all_grid_form_name">
+                    <span id="ctl00_cntphmaster_lblExamType"><font color="#333333">وظيفة الامتحان</font></span>
+
+                </td>
+		<td class="input_normal">
+                    <select name="ctl00$cntphmaster$drpExamType" id="ctl00_cntphmaster_drpExamType">
+			<option value="1">دور أول</option>
+			<option value="2">دور ثاني</option>
+
+		</select>
+                </td>
+	</tr>
+	
+            <tr>
+
+                <td colspan="5" align="center">
+                    <input type="submit" name="ctl00$cntphmaster$searchButton" value="بحث" onclick="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;ctl00$cntphmaster$searchButton&quot;, &quot;&quot;, true, &quot;&quot;, &quot;&quot;, false, false))" id="ctl00_cntphmaster_searchButton" class="Button" />
+                    <br />
+                    
+                </td>
+
+            </tr>
+        </table>
+    
+</div>
+
+    
+    <div id="ctl00_cntphmaster_pnl_Modular" class="all_details">
+	
+                
+
+        
+
+                
+          
+    
+</div>
+    
+
+    
+    
+    
+    
+
+    <div class="all_details">
+	
+        <span class="title_all_details">
+            <img id="ctl00_cntphmaster_Image1" src="../../Images/green_balls.png" border="0" />
+            <span id="ctl00_cntphmaster_Label20"><font color="#333333">رموز التقديرات</font></span>
+        </span>
+        <br />
+
+        
+
+    
+</div>
+
+
+                                    
+                                    <!--overview-->
+                                    
+                                    <!--viewport-->
+                                </div>
+                                <!--scrollbar_all_info-->
+                            </div>
+                            <!--scroll_all_info-->
+                        </div>
+                        <!--all_info-->
+                    </div>
+                    <!--holder-->
+                </div>
+                <!--all_content-->
+                <div id="footer">
+                    <div class="holder">
+                        <p>
+                            &copy;&nbsp;Copyright 2023 . <a href="https://informatique-edu.com/">Informatique Education</a> . All Rights Reserved
+                        </p>
+                        <div id="umis">
+                            <img src="../../images/umis.png" id="ctl00_Img3" />
+                        </div>
+                        <!--umis-->
+                    </div>
+                    <!--holder-->
+                </div>
+                <!--footer-->
+            </div>
+            <!--content-->
+
+            
+            <!--scrollbar_help-->
+        </div>
+        <!--wrapper-->
+        <script src="../../JavaScript/AfterPageLoadOperations.js" type="text/javascript"></script>
+        
+        
+        <input name="ctl00$txthdndegreeclassctrl_Ids" type="text" value="0" id="ctl00_txthdndegreeclassctrl_Ids" style="display:none;" />
+    
+
+<script type="text/javascript">
+//<![CDATA[
+eWorld_NumericBox_Items = new Array(new NumericBox_Item('ctl00_FixNumericBoxProblem', true, false, '^[-]?\\d*(\\.?\\d*)?$', -1, '$', '.', ',', -1, '', false));Sys.Application.add_init(function() {
+    $create(AjaxControlToolkit.MaskedEditBehavior, {"ClientStateFieldID":"ctl00_MaskedBirthDate_ClientState","CultureAMPMPlaceholder":"ص;م","CultureCurrencySymbolPlaceholder":"ج.م.‏","CultureDateFormat":"DMY","CultureDatePlaceholder":"/","CultureDecimalPlaceholder":".","CultureName":"ar-EG","CultureThousandsPlaceholder":",","CultureTimePlaceholder":":","Mask":"99/99/9999","MaskType":1,"UserDateFormat":1,"id":"ctl00_MaskedBirthDate"}, null, null, $get("ctl00_txtFixCalendarProblem"));
+});
+Sys.Application.add_init(function() {
+    $create(AjaxControlToolkit.CalendarBehavior, {"button":$get("ctl00_btnFixCalendarProblem"),"cssClass":"Calendar","format":"dd/MM/yyyy","id":"ctl00_calFixCalendarProblem"}, null, null, $get("ctl00_txtFixCalendarProblem"));
+});
+//]]>
+</script>
+</form>
+    <script type="text/javascript">
+        function searchMenue() {
+
+            var input, filter;
+            input = document.getElementById("ctl00_txtSearch");
+            filter = input.value.toUpperCase();
+            if (filter == "") {
+
+                $('.expanded').each(function () {
+                    $(this).removeClass('expanded');
+                })
+                $('#nav li ul:not(.expanded)').hide(500);
+                $('#nav li').each(function () {
+                    $(this).css("display", "")
+                })
+                return false
+            }
+
+            $('#nav li').each(function () {
+
+                var hasMatch = filter.length == 0 || $(this).text().toLowerCase().indexOf(filter.toLowerCase()) > 0;
+
+                if (hasMatch) {
+                    $(this).css("display", "")
+                    $(this).closest("ul").show('fast');
+                    $(this).closest("ul").addClass('expanded');
+
+                } else {
+
+                    $(this).css("display", "none")
+
+                }
+            })
+
+        }
+
+</script>
+</body>
+</html>
