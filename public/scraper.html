@@ -10,27 +10,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .scraper-container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 2rem auto;
             padding: 20px;
         }
 
+        /* Progress bar */
         .progress-wrapper {
             width: 100%;
-            background-color: var(--surface-bg);
+            background-color: rgba(0, 0, 0, 0.3);
             border: 1px solid var(--surface-border);
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
             margin: 20px 0;
-            height: 25px;
+            height: 30px;
             position: relative;
         }
 
         .progress-bar {
             height: 100%;
-            background-color: var(--primary-color);
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
             width: 0%;
-            transition: width 0.3s ease;
+            transition: width 0.5s ease;
+            border-radius: 10px;
         }
 
         .progress-text {
@@ -41,27 +43,151 @@
             color: white;
             font-size: 0.85rem;
             font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
         }
 
-        .logs-box {
-            background-color: rgba(0, 0, 0, 0.4);
+        /* Stats grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--surface-border);
-            border-radius: 8px;
-            padding: 15px;
-            height: 300px;
-            overflow-y: auto;
-            font-family: monospace;
+            padding: 14px 10px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--primary-light, var(--accent-color));
+        }
+
+        /* Current activity panel */
+        .activity-panel {
+            background: rgba(67, 97, 238, 0.08);
+            border: 1px solid rgba(67, 97, 238, 0.2);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .activity-panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .activity-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .activity-header i {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        .activity-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
             font-size: 0.9rem;
+        }
+
+        .activity-detail {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+        }
+
+        .activity-detail span {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .query-progress {
+            margin-top: 10px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .query-progress-bar {
+            height: 100%;
+            background: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s;
+            border-radius: 4px;
+        }
+
+        /* Logs */
+        .logs-box {
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 15px;
+            height: 280px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.82rem;
             color: #a0aec0;
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 3px;
+        }
+
+        .logs-box::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .logs-box::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .logs-box::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
         }
 
         .log-entry {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            padding: 3px 0;
+            line-height: 1.4;
         }
 
         .log-success {
@@ -76,26 +202,123 @@
             color: #60a5fa;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
+        .log-warn {
+            color: #fbbf24;
+        }
+
+        .log-query {
+            color: #a78bfa;
+        }
+
+        .log-dim {
+            color: #64748b;
+        }
+
+        /* Buttons */
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
             margin-bottom: 20px;
         }
 
-        .stat-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--surface-border);
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
+        .stop-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-family: var(--font-family);
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary-light);
-            margin-top: 5px;
+        .stop-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -10px #ef4444;
+        }
+
+        .stop-btn:active {
+            transform: translateY(1px);
+        }
+
+        .stop-btn.visible {
+            display: inline-flex;
+        }
+
+        .stop-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Download area */
+        .download-area {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            margin-top: 15px;
+            padding: 20px;
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+        }
+
+        .download-area.visible {
+            display: flex;
+            animation: slideUp 0.4s ease;
+        }
+
+        .download-title {
+            font-weight: 700;
+            color: #4ade80;
+            margin-bottom: 5px;
+            font-size: 1.05rem;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            text-decoration: none;
+            padding: 10px 24px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-family);
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px -6px #10b981;
+        }
+
+        /* Timer */
+        .timer-display {
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: var(--accent-color);
+            font-weight: 700;
+        }
+
+        @media (max-width: 600px) {
+            .activity-details {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
@@ -114,42 +337,92 @@
 
     <main class="scraper-container">
         <div class="glass-card">
-            <header class="page-header" style="text-align: center; margin-bottom: 2rem;">
+            <header class="page-header" style="text-align: center; margin-bottom: 1.5rem;">
                 <h2><i class="fa-solid fa-cloud-arrow-down" style="color:var(--primary-color);"></i> ساحب النتائج
                     التلقائي</h2>
-                <p>سحب نتائج جميع الطلاب المسجلين بصيغة Excel</p>
+                <p>سحب نتائج جميع الطلاب المسجلين وتصديرها في ملفات Excel</p>
             </header>
 
+            <!-- Stats -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div>إجمالي الحسابات</div>
+                    <div class="stat-label">إجمالي الطلاب</div>
                     <div class="stat-value" id="statTotal">0</div>
                 </div>
                 <div class="stat-card">
-                    <div>تم السحب</div>
+                    <div class="stat-label">تم بنجاح</div>
                     <div class="stat-value" id="statSuccess" style="color: #4ade80;">0</div>
                 </div>
                 <div class="stat-card">
-                    <div>فشل/غير متاح</div>
+                    <div class="stat-label">فشل</div>
                     <div class="stat-value" id="statFailed" style="color: #f87171;">0</div>
                 </div>
-            </div>
-
-            <div style="text-align: center; margin-bottom: 20px;">
-                <button id="startBtn" class="primary-btn" style="font-size: 1.1rem; padding: 12px 30px;">
-                    <i class="fa-solid fa-play"></i>
-                    <span>بدء عملية السحب الآن</span>
-                </button>
-                <div id="downloadContainer"
-                    style="display: none; margin-top: 15px; flex-direction: column; gap: 10px; align-items: center;">
+                <div class="stat-card">
+                    <div class="stat-label">الوقت المنقضي</div>
+                    <div class="stat-value timer-display" id="statTimer">00:00</div>
                 </div>
             </div>
 
+            <!-- Buttons -->
+            <div class="btn-row">
+                <button id="startBtn" class="primary-btn" style="font-size: 1.05rem; padding: 12px 30px; width: auto;">
+                    <i class="fa-solid fa-play"></i>
+                    <span>بدء عملية السحب</span>
+                </button>
+                <button id="stopBtn" class="stop-btn">
+                    <i class="fa-solid fa-stop"></i>
+                    <span>إيقاف السحب</span>
+                </button>
+            </div>
+
+            <!-- Activity Panel -->
+            <div class="activity-panel" id="activityPanel">
+                <div class="activity-header">
+                    <i class="fa-solid fa-circle-dot"></i>
+                    <span id="activityTitle">جاري المعالجة...</span>
+                </div>
+                <div class="activity-details">
+                    <div class="activity-detail">
+                        <i class="fa-solid fa-user"></i> الطالب: <span id="actCurrentStudent">-</span>
+                    </div>
+                    <div class="activity-detail">
+                        <i class="fa-solid fa-calendar"></i> بدأ من: <span id="actStartYear">-</span>
+                    </div>
+                    <div class="activity-detail">
+                        <i class="fa-solid fa-magnifying-glass"></i> الاستعلام: <span id="actQuery">-</span>
+                    </div>
+                    <div class="activity-detail">
+                        <i class="fa-solid fa-list-ol"></i> تقدم: <span id="actQueryProgress">0/0</span>
+                    </div>
+                </div>
+                <div class="query-progress">
+                    <div class="query-progress-bar" id="queryProgressBar"></div>
+                </div>
+            </div>
+
+            <!-- Progress bar -->
             <div class="progress-wrapper">
                 <div class="progress-bar" id="progressBar"></div>
                 <div class="progress-text" id="progressText">0% (0 / 0)</div>
             </div>
 
+            <!-- Download area -->
+            <div class="download-area" id="downloadArea">
+                <div class="download-title"><i class="fa-solid fa-check-circle"></i> الملفات جاهزة للتحميل</div>
+                <div id="downloadLinks"></div>
+            </div>
+
+            <!-- Logs -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-weight: 700; font-size: 0.95rem; color: var(--text-secondary);">
+                    <i class="fa-solid fa-terminal"></i> سجل العمليات
+                </span>
+                <button id="clearLogsBtn"
+                    style="background: none; border: 1px solid var(--surface-border); color: var(--text-secondary); padding: 4px 12px; border-radius: 8px; cursor: pointer; font-family: var(--font-family); font-size: 0.8rem;"
+                    onclick="document.getElementById('logsBox').innerHTML=''">
+                    <i class="fa-solid fa-eraser"></i> مسح
+                </button>
+            </div>
             <div class="logs-box" id="logsBox">
                 <div class="log-entry log-info">> النظام جاهز. اضغط على بدء السحب للانطلاق...</div>
             </div>

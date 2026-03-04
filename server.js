@@ -299,6 +299,7 @@ app.get('/api/logins', (req, res) => {
 
 // Route: Start Scraping (Deduplicate logins and start process)
 let isScraping = false;
+let stopRequested = false;
 let scraperClients = [];
 let scrapeProgress = { total: 0, current: 0, successCount: 0, failCount: 0, results: [] };
 
@@ -356,6 +357,15 @@ app.post('/api/start-scraping', async (req, res) => {
     }
 });
 
+// Route: Stop Scraping
+app.post('/api/stop-scraping', (req, res) => {
+    if (!isScraping) {
+        return res.json({ success: false, message: 'لا توجد عملية سحب قيد التشغيل.' });
+    }
+    stopRequested = true;
+    res.json({ success: true, message: 'تم طلب إيقاف السحب. سيتوقف بعد الطالب الحالي.' });
+});
+
 // SSE Endpoint for Scrape Stream
 app.get('/api/scrape-stream', (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
@@ -381,23 +391,78 @@ const sendSSEScrapingUpdate = (data) => {
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// The 6 scraping combinations: year/semester/round
-// Semester mapping: sem1 = year15/sem1, sem2 = year15/sem2, sem3 = year16/sem1
-const SCRAPE_SEMESTER_CONFIG = [
-    { semKey: 'semester1', year: '15', semester: '1', label: 'Semester 1 (2024/2025 - أول)' },
-    { semKey: 'semester2', year: '15', semester: '2', label: 'Semester 2 (2024/2025 - ثانى)' },
-    { semKey: 'semester3', year: '16', semester: '1', label: 'Semester 3 (2025/2026 - أول)' }
-];
+// ==================== HELPER FUNCTIONS ====================
+
+const MAX_PORTAL_YEAR = 16; // 2025/2026 is the latest year to scrape
+const PORTAL_SEMESTERS = ['1', '2']; // Portal semester 1=أول, 2=ثانى
 const ROUNDS = ['1', '2']; // دور أول + دور ثاني
+
+/**
+ * Extract the starting academic year portal value from a student code.
+ * e.g. "120240002454" → skip 3 chars → "24" → 2024/2025 → portal value 15
+ *      "120230000386" → "23" → 2023/2024 → portal value 14
+ */
+function getStartPortalYear(studentCode) {
+    const yearDigits = studentCode.substring(3, 5); // skip first 3, take next 2
+    const startYear = 2000 + parseInt(yearDigits, 10); // e.g. 24 → 2024
+    const portalValue = startYear - 2009; // 2024 → 15, 2023 → 14
+    return portalValue;
+}
+
+/**
+ * Convert a portal year value to a display string.
+ * e.g. 15 → "2024/2025", 16 → "2025/2026"
+ */
+function portalYearToLabel(portalYear) {
+    const startYear = portalYear + 2009;
+    return `${startYear}/${startYear + 1}`;
+}
+
+/**
+ * Extract the semester code (e.g. "01", "02", "03") from a subject code.
+ * Subject code format: "IMP07-10102_01" or "URR07-10101_01"
+ * The numeric part after the dash: "10102" → parse as 1|01|02
+ * - First digit: year level
+ * - Next two digits: semester code (01, 02, 03, etc.)
+ * - Last two digits: subject number
+ *
+ * Returns the semester code string or null if can't parse.
+ */
+function getTermFromSubjectCode(subjectCode) {
+    // Extract the numeric portion after the dash, before underscore
+    // e.g. "IMP07-10102_01" → we need "10102"
+    const match = subjectCode.match(/-(\d{5,})/);
+    if (!match) return null;
+
+    const numericPart = match[1];
+    // Format: X YY ZZ (year_level, semester_code, subject_num)
+    // Take chars at index 1-2 for semester code
+    const semCode = numericPart.substring(1, 3);
+    return semCode; // "01", "02", "03", etc.
+}
+
+/**
+ * Map a semester code to the output term key.
+ * "01" → "term1", "02" → "term2", "03" → "term3"
+ * Anything else → null (ignored)
+ */
+function semCodeToTermKey(semCode) {
+    if (semCode === '01') return 'term1';
+    if (semCode === '02') return 'term2';
+    if (semCode === '03') return 'term3';
+    return null; // 04+ is ignored
+}
+
+// ==================== SCRAPER BACKGROUND ====================
 
 const runScraperBackground = async (students) => {
     console.log(`[SCRAPER] Starting background scrape for ${students.length} students.`);
 
-    // Collect results per semester across all students
-    const allSemesterResults = {
-        semester1: [],
-        semester2: [],
-        semester3: []
+    // Collect results per term across all students
+    const allTermResults = {
+        term1: [],
+        term2: [],
+        term3: []
     };
 
     for (let i = 0; i < students.length; i++) {
@@ -409,128 +474,122 @@ const runScraperBackground = async (students) => {
 
             console.log(`[SCRAPER] Processing ${student.username} (${i + 1}/${students.length})`);
 
-            // --- 1. LOGIN ---
+            // --- 1. Determine year range for this student ---
+            const startPortalYear = getStartPortalYear(student.username);
+            const yearRange = [];
+            for (let y = startPortalYear; y <= MAX_PORTAL_YEAR; y++) {
+                yearRange.push(y);
+            }
+            console.log(`[SCRAPER]   Student ${student.username}: start year=${portalYearToLabel(startPortalYear)}, scraping ${yearRange.length} years`);
+
+            // --- 2. LOGIN ---
             const loginResult = await performLogin(student.username, student.password);
             if (!loginResult.success) {
                 throw new Error(loginResult.message);
             }
 
-            // --- 2. GET RESULTS for all 6 combinations ---
-            // Store raw subjects per semester (merged from rounds)
-            const studentSemesterData = {};
+            // --- 3. GET RESULTS for all year/semester/round combinations ---
+            // Collect ALL subjects with metadata about when they were fetched
+            // Key: subjectCode → { subject, queryOrder } (latest queryOrder wins)
+            const subjectMap = new Map();
+            let studentName = '';
+            let gpa1 = '';
+            let gpau1 = '';
+            let queryOrder = 0;
 
-            for (const semConfig of SCRAPE_SEMESTER_CONFIG) {
-                const mergedSubjects = new Map(); // subjectCode -> subject (latest round wins)
-                let studentName = '';
-                let gpa1 = '';
-                let gpau1 = '';
-                let totalMarksSum = 0;
-                let hasAnyResults = false;
+            const totalQueries = yearRange.length * PORTAL_SEMESTERS.length * ROUNDS.length;
+            sendSSEScrapingUpdate({
+                type: 'student_start',
+                student: student.username,
+                startYear: portalYearToLabel(startPortalYear),
+                yearCount: yearRange.length,
+                totalQueries: totalQueries,
+                index: i + 1,
+                total: students.length
+            });
 
-                for (const round of ROUNDS) {
-                    console.log(`[SCRAPER]   Fetching: ${semConfig.label}, Round ${round}`);
-                    await delay(1000); // small delay between each request
+            for (const portalYear of yearRange) {
+                for (const portalSem of PORTAL_SEMESTERS) {
+                    for (const round of ROUNDS) {
+                        queryOrder++;
+                        const label = `${portalYearToLabel(portalYear)} Sem${portalSem} Round${round}`;
+                        console.log(`[SCRAPER]   Fetching: ${label}`);
 
-                    const resultsData = await performGetResults(
-                        loginResult.sessionToken,
-                        semConfig.year,
-                        semConfig.semester,
-                        round
-                    );
-
-                    if (resultsData.success && resultsData.data && resultsData.data.length > 0) {
-                        hasAnyResults = true;
-                        studentName = resultsData.studentInfo.name || studentName;
-                        gpa1 = resultsData.studentInfo.gpa1 || gpa1;
-                        gpau1 = resultsData.studentInfo.gpau1 || gpau1;
-
-                        // Merge: round 2 overwrites round 1 for same subject
-                        resultsData.data.forEach(sub => {
-                            mergedSubjects.set(sub.subjectCode, sub);
+                        // Send query-level SSE update
+                        sendSSEScrapingUpdate({
+                            type: 'query',
+                            student: student.username,
+                            queryLabel: label,
+                            queryNum: queryOrder,
+                            totalQueries: totalQueries
                         });
-                    }
-                }
 
-                if (hasAnyResults) {
-                    // Recalculate totalMarksSum from merged subjects
-                    const subjects = Array.from(mergedSubjects.values());
-                    totalMarksSum = subjects.reduce((sum, s) => sum + (parseFloat(s.finalMark) || 0), 0);
+                        await delay(1000);
 
-                    studentSemesterData[semConfig.semKey] = {
-                        subjects,
-                        studentName,
-                        gpa1,
-                        gpau1,
-                        totalMarksSum
-                    };
-                }
-            }
+                        const resultsData = await performGetResults(
+                            loginResult.sessionToken,
+                            String(portalYear),
+                            portalSem,
+                            round
+                        );
 
-            // --- 3. DEDUPLICATE subjects across semesters ---
-            // Track first appearance of each subject
-            const firstSeen = {}; // subjectCode -> semKey
-            const semOrder = ['semester1', 'semester2', 'semester3'];
+                        if (resultsData.success && resultsData.data && resultsData.data.length > 0) {
+                            studentName = resultsData.studentInfo.name || studentName;
+                            gpa1 = resultsData.studentInfo.gpa1 || gpa1;
+                            gpau1 = resultsData.studentInfo.gpau1 || gpau1;
 
-            // First pass: determine first semester appearance for each subject
-            for (const semKey of semOrder) {
-                const semData = studentSemesterData[semKey];
-                if (!semData) continue;
-                for (const sub of semData.subjects) {
-                    if (!firstSeen[sub.subjectCode]) {
-                        firstSeen[sub.subjectCode] = semKey;
-                    }
-                }
-            }
-
-            // Second pass: move retaken subjects to original semester
-            // Process in reverse order (latest first) so latest result wins
-            for (let s = semOrder.length - 1; s >= 0; s--) {
-                const semKey = semOrder[s];
-                const semData = studentSemesterData[semKey];
-                if (!semData) continue;
-
-                const subjectsToKeep = [];
-                for (const sub of semData.subjects) {
-                    const originalSem = firstSeen[sub.subjectCode];
-                    if (originalSem !== semKey) {
-                        // This subject was retaken - move latest result to original semester
-                        const origSemData = studentSemesterData[originalSem];
-                        if (origSemData) {
-                            // Replace the original semester's entry with this (latest) result
-                            const existingIdx = origSemData.subjects.findIndex(
-                                existing => existing.subjectCode === sub.subjectCode
-                            );
-                            if (existingIdx !== -1) {
-                                origSemData.subjects[existingIdx] = sub;
-                            } else {
-                                origSemData.subjects.push(sub);
-                            }
+                            // Store/overwrite each subject - later queries always win
+                            resultsData.data.forEach(sub => {
+                                subjectMap.set(sub.subjectCode, {
+                                    ...sub,
+                                    _queryOrder: queryOrder
+                                });
+                            });
                         }
-                        // Don't keep in current semester
-                    } else {
-                        subjectsToKeep.push(sub);
                     }
                 }
-                semData.subjects = subjectsToKeep;
             }
 
-            // --- 4. Recalculate totals after dedup and push to results ---
-            for (const semKey of semOrder) {
-                const semData = studentSemesterData[semKey];
-                if (!semData || semData.subjects.length === 0) continue;
 
-                const recalcTotal = semData.subjects.reduce(
+            // --- 4. Assign subjects to terms based on SUBJECT CODE ---
+            const termSubjects = { term1: [], term2: [], term3: [] };
+
+            for (const [code, sub] of subjectMap) {
+                const semCode = getTermFromSubjectCode(code);
+                if (!semCode) {
+                    console.log(`[SCRAPER]   WARNING: Could not parse term from subject code: ${code}, skipping.`);
+                    continue;
+                }
+
+                const termKey = semCodeToTermKey(semCode);
+                if (!termKey) {
+                    // Semester code is 04 or higher → ignore
+                    console.log(`[SCRAPER]   Ignoring subject ${code} with semester code ${semCode} (> 03)`);
+                    continue;
+                }
+
+                // Remove internal metadata before storing
+                const { _queryOrder, ...cleanSub } = sub;
+                termSubjects[termKey].push(cleanSub);
+            }
+
+            // --- 5. Push to results per term ---
+            for (const termKey of ['term1', 'term2', 'term3']) {
+                const subjects = termSubjects[termKey];
+                if (subjects.length === 0) continue;
+
+                const totalMarks = subjects.reduce(
                     (sum, s) => sum + (parseFloat(s.finalMark) || 0), 0
                 );
 
-                allSemesterResults[semKey].push({
+                allTermResults[termKey].push({
                     studentCode: student.username,
                     nationalId: student.password,
-                    studentName: semData.studentName || 'بدون اسم',
-                    totalMarksSum: recalcTotal,
-                    gpa1: semData.gpa1 || '',
-                    gpau1: semData.gpau1 || '',
-                    subjects: semData.subjects
+                    studentName: studentName || 'بدون اسم',
+                    totalMarksSum: totalMarks,
+                    gpa1: gpa1 || '',
+                    gpau1: gpau1 || '',
+                    subjects: subjects
                 });
             }
 
@@ -542,6 +601,14 @@ const runScraperBackground = async (students) => {
                 student: student.username,
                 ...scrapeProgress
             });
+
+            // Check if stop was requested after finishing this student
+            if (stopRequested) {
+                console.log(`[SCRAPER] Stop requested after processing ${student.username}`);
+                sendSSEScrapingUpdate({ type: 'info', message: `⏹️ تم إيقاف السحب بعد الطالب ${student.username}` });
+                // Immediately jump to Excel generation with whatever we have so far
+                break;
+            }
 
         } catch (error) {
             console.error(`[SCRAPER] Error processing ${student.username}:`, error.message);
@@ -561,7 +628,7 @@ const runScraperBackground = async (students) => {
 
     // Finished processing all. Now export to 3 Excel files.
     try {
-        const files = await generateMultiExcelReport(allSemesterResults);
+        const files = await generateMultiExcelReport(allTermResults);
 
         sendSSEScrapingUpdate({
             type: 'complete',
@@ -577,6 +644,7 @@ const runScraperBackground = async (students) => {
     }
 
     isScraping = false;
+    stopRequested = false;
     scraperClients.forEach(client => client.end());
     scraperClients = [];
 };
@@ -813,19 +881,19 @@ async function generateSingleExcel(resultsArray, sheetName, fileName) {
     return fileName;
 }
 
-// Generate 3 Excel files (one per semester)
-async function generateMultiExcelReport(allSemesterResults) {
+// Generate 3 Excel files (one per term)
+async function generateMultiExcelReport(allTermResults) {
     const timestamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
     const files = [];
 
-    const semesterMeta = [
-        { key: 'semester1', sheet: '2024-2025 Semester 1', file: `semester1_2024_2025_${timestamp}.xlsx` },
-        { key: 'semester2', sheet: '2024-2025 Semester 2', file: `semester2_2024_2025_${timestamp}.xlsx` },
-        { key: 'semester3', sheet: '2025-2026 Semester 3', file: `semester3_2025_2026_${timestamp}.xlsx` }
+    const termMeta = [
+        { key: 'term1', sheet: 'Term 1', file: `term1_${timestamp}.xlsx` },
+        { key: 'term2', sheet: 'Term 2', file: `term2_${timestamp}.xlsx` },
+        { key: 'term3', sheet: 'Term 3', file: `term3_${timestamp}.xlsx` }
     ];
 
-    for (const meta of semesterMeta) {
-        const results = allSemesterResults[meta.key] || [];
+    for (const meta of termMeta) {
+        const results = allTermResults[meta.key] || [];
         if (results.length > 0) {
             const fileName = await generateSingleExcel(results, meta.sheet, meta.file);
             files.push({ fileName, label: meta.sheet, count: results.length });
